@@ -1,89 +1,121 @@
 #include<stdio.h>
 int main()
 {
-    int no_of_frames, no_of_pages, frames[10], pages[30], temp[10], flag1, flag2, flag3, i, j, k, pos, max, faults = 0;
-    printf("Enter number of frames: ");
-    scanf("%d", &no_of_frames);
+    int FrameNo, PageNo, frames[10], pages[30], Positions[10],pos, max, faults = 0;
+    int hits=0,f1, f2, f3, i, j, k;
+    int hit[30];
+    printf("No of Frames: ");
+    scanf("%d", &FrameNo);
     
-    printf("Enter number of pages: ");
-    scanf("%d", &no_of_pages);
+    printf("No of Pages in Reference String: ");
+    scanf("%d", &PageNo);
     
-    printf("Enter page reference string: ");
+    printf("Enter The pages in the Reference String: ");
     
-    for(i = 0; i < no_of_pages; ++i){
+    for(i = 0; i < PageNo; ++i){
         scanf("%d", &pages[i]);
     }
     
-    for(i = 0; i < no_of_frames; ++i){
+    //Defaultly all the data in the frames are -1 as to show they are empty
+    printf("\n\n\n\n");
+    for(i = 0; i < FrameNo; ++i){
         frames[i] = -1;
     }
     
-    for(i = 0; i < no_of_pages; ++i){
-        flag1 = flag2 = 0;
-        
-        for(j = 0; j < no_of_frames; ++j){
+    //Display things 
+    
+    printf("String |\t");
+    for(i=0;i<FrameNo;i++)
+    {
+        printf("f%d\t",i);
+    }
+    printf("| Hit or Miss\n");
+    printf("---------------------------------------------------------------\n");
+    
+    //start to check the frames
+    for(i = 0; i < PageNo; ++i){
+        f1 = f2 = 0;
+        for(j = 0; j < FrameNo; ++j){                   // it checks of its a hit or not  
             if(frames[j] == pages[i]){
-                   flag1 = flag2 = 1;
+                   f1 = f2 = 1;
+                   hit[i] = 1;
+                   hits+=1;
                    break;
                }
         }
         
-        if(flag1 == 0){
-            for(j = 0; j < no_of_frames; ++j){
+        if(f1 == 0){
+            for(j = 0; j < FrameNo; ++j){
                 if(frames[j] == -1){
-                    faults++;
+                    faults++;                           // intial miss when all the frames are not filled 
+                    hit[i]=0;
                     frames[j] = pages[i];
-                    flag2 = 1;
+                    f2 = 1;
                     break;
                 }
             }    
         }
         
-        if(flag2 == 0){
-         flag3 =0;
+        if(f2 == 0){
+         f3 =0;
         
-            for(j = 0; j < no_of_frames; ++j){
-             temp[j] = -1;
+            for(j = 0; j < FrameNo; ++j){
+             Positions[j] = -1;
             
-             for(k = i + 1; k < no_of_pages; ++k){
+             for(k = i + 1; k < PageNo; ++k){           //takes the postions of all the pages that are repeating 
              if(frames[j] == pages[k]){
-             temp[j] = k;
+             Positions[j] = k;
              break;
              }
              }
             }
             
-            for(j = 0; j < no_of_frames; ++j){
-             if(temp[j] == -1){
-             pos = j;
-             flag3 = 1;
+            for(j = 0; j < FrameNo; ++j){
+             if(Positions[j] == -1){
+             pos = j;                                   
+             f3 = 1;                                    //and other if not repeating puts -1
              break;
              }
             }
             
-            if(flag3 ==0){
-             max = temp[0];
+            if(f3 ==0){
+             max = Positions[0];
              pos = 0;
             
-             for(j = 1; j < no_of_frames; ++j){
-             if(temp[j] > max){
-             max = temp[j];
+             for(j = 1; j < FrameNo; ++j){                      // if all are repeating
+             if(Positions[j] > max){                            // checks which is repeating after the most time
+             max = Positions[j];
              pos = j;
              }
              }            
             }
-frames[pos] = pages[i];
-faults++;
+    hit[i]=0;                                                   // replaces the frame which repeats after the most time
+    frames[pos] = pages[i];
+    faults++;
         }
         
-        printf("\n");
-        
-        for(j = 0; j < no_of_frames; ++j){
+        printf("%d      |\t",pages[i]);
+        for(j = 0; j < FrameNo; ++j){
+            if(frames[j] == -1)
+            {
+                printf("empty\t");                              //printf if the frame is empty 
+            }
+            else{
             printf("%d\t", frames[j]);
+            }
+            
         }
+        if(hit[i] == 0){
+            printf("| Miss");                                   // prints if the replacement is 
+        }
+        else if (hit[i]==1)
+        {
+            printf("| Hit");
+        }
+        printf("\n");
     }
     
-    printf("\n\nTotal Page Faults = %d", faults);
-    
+    printf("\n\nPage faults/Misses = %d", faults);
+    printf("\tHits = %d",hits);
     return 0;
 }
